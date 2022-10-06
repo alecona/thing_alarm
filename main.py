@@ -12,11 +12,6 @@ ret, firstframe = cap.read()
 firstframe_gray = cv2.cvtColor(firstframe, cv2.COLOR_BGR2GRAY)
 firstframe_blur = cv2.GaussianBlur(firstframe_gray, (21, 21), 0)
 
-#cv2.namedWindow('CannyEdgeDet', cv2.WINDOW_NORMAL)
-#cv2.namedWindow('Abandoned Object Detection', cv2.WINDOW_NORMAL)
-#cv2.namedWindow('Morph_CLOSE', cv2.WINDOW_NORMAL)
-
-
 
 consecutiveframe = 20
 
@@ -25,12 +20,10 @@ track_master = []
 track_temp2 = []
 
 top_contour_dict = defaultdict(int)
-#obj_detected_dict = defaultdict(int)
 
 frameno = 0
 while (cap.isOpened()):
     ret, frame = cap.read()
-    #cv2.imshow('main', frame)
 
     if ret == 0:
         break
@@ -44,10 +37,8 @@ while (cap.isOpened()):
 
     # Canny Edge Detection
     edged = cv2.Canny(frame_diff, 10, 200)
-    #cv2.imshow('CannyEdgeDet', edged)
     kernel2 = np.ones((5, 5), np.uint8)
     thresh2 = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel2, iterations=2)
-    #cv2.imshow('Morph_Close', thresh2)
 
     (cnts, _) = cv2.findContours(thresh2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -92,21 +83,8 @@ while (cap.isOpened()):
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
                         cv2.putText(frame, '%s' % ('ALARM'), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 1,
                                     (0, 0, 255), 2)
-                        '''
-                        print('Detected : ', sumcxcy, frameno, obj_detected_dict)
-                        obj_detected_dict[sumcxcy] = frameno
-                        '''
-    '''
-    for i, j in obj_detected_dict.items():
-        if frameno - obj_detected_dict[i] > 200:
-            print('PopBefore', i, obj_detected_dict[i], frameno, obj_detected_dict)
-            print('PopBefore : top_contour :', top_contour_dict)
-            obj_detected_dict.pop(i)
 
-            top_contour_dict[i] = 0
-            print('PopAfter', i, obj_detected_dict[i], frameno, obj_detected_dict)
-            print('PopAfter : top_contour :', top_contour_dict)
-    '''
+
     cv2.imshow('thing_alarm', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
